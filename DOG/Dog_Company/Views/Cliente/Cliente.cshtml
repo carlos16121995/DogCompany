@@ -1,0 +1,289 @@
+﻿
+@{
+    ViewBag.Titulo = "Cliente";
+    Layout = "~/Views/Shared/_LayoutPrincipal.cshtml";
+}
+@section style {
+    <link href="~/lib/dialog/dialog.css" rel="stylesheet" />
+    <style>
+        .btn-primary {
+            background-color: #2bceba;
+            border-color: #2bceba;
+        }
+
+        .btn {
+            background-color: #2bceba;
+            border-color: #2bceba;
+        }
+        .invalid {
+            font-size: 12px;
+            color: red;
+        }
+
+        .inputInvalid {
+            border-bottom: 1px solid red !important;
+        }
+    </style>
+}
+@section script  {
+    <script src="~/lib/validation/validation.js"></script>
+    <script src="~/lib/dialog/dialog.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            cli.init();
+
+
+        });
+
+        var cli = {
+
+            init: function () {
+                y.byId("cpf").onkeyup = cli.cpfOnKeyUp;
+                y.byId("btnF").onclick = y.esconder;
+                y.byId("close").onclick = y.esconder;
+                y.byId("gravar").onclick = cli.gravar;
+                y.byId("limpar").onclick = cli.clear;
+                y.byId("excluir").onclick = cli.confirma;
+            },
+
+            clear: function () {
+                y.byId("nome").value = "";
+                y.byId("sobrenome").value = "";
+                y.byId("celular").value = "";
+                y.byId("cidade").value = "";
+                y.byId("bairro").value = "";
+                y.byId("rua").value = "";
+                y.byId("numero").value = "";
+            },
+
+            cpfOnKeyUp: function () {
+                var cpf = document.getElementById("cpf").value;
+                if (cpf.length == 11) {
+                    var cpf = {
+                        cpf: cpf
+                    }
+                    y.ajax(cpf, "/Cliente/PesquisarCpf", "POST", function (dados) {
+                        if (dados.existe && dados.valido) {
+                            y.byId("nome").value = dados.cliente.nome;
+                            y.byId("sobrenome").value = dados.cliente.sobrenome;
+                            y.byId("celular").value = dados.cliente.celular;
+                            y.byId("cidade").value = dados.cliente.cidade;
+                            y.byId("bairro").value = dados.cliente.bairro;
+                            y.byId("rua").value = dados.cliente.rua;
+                            y.byId("numero").value = dados.cliente.numero;
+                        }
+                        if (dados.valido && !dados.existe) {
+                            cli.clear();
+                            return
+                        }
+                        if (!dados.valido) {
+                            y.byId("msg").innerHTML = "";
+                            document.querySelector(".modal").classList.add("show");
+                            document.querySelector(".modal").style.display = "block";
+                            cli.clear();
+                            y.byId("msg").innerHTML = "CPF inválido!";
+                            y.byId("cpf").value = "";
+                        }
+                    }, function () {
+                        y.byId("msg").innerHTML = "";
+                        document.querySelector(".modal").classList.add("show");
+                        document.querySelector(".modal").style.display = "block";
+                    });
+                }
+            },
+
+            gravar: function () {
+                var cpf = y.pegar("cpf");
+                var nome = y.pegar("nome");
+                var sobrenome = y.pegar("sobrenome");
+                var celular = y.pegar("celular");
+                var cidade = y.pegar("cidade");
+                var bairro = y.pegar("bairro");
+                var rua = y.pegar("rua");
+                var numero = y.pegar("numero");
+
+                if (!validation.formIsValid()) {
+
+                    //alert("Veja as validações");
+                    return;
+
+                }
+                if (cpf.length == 11 && nome != "" && sobrenome != "" && celular != "" && cidade != "" && bairro != "" && rua != "" && numero != "" && !isNaN(numero)) {
+                    var dados = {
+                        cpf: cpf,
+                        nome: nome,
+                        sobrenome: sobrenome,
+                        celular: celular,
+                        cidade: cidade,
+                        bairro: bairro,
+                        rua: rua,
+                        numero: numero
+                    }
+                    y.ajax(dados, "/Cliente/Gravar", "POST", function (retorno) {
+                        if (retorno.gravou) {
+                            y.byId("msg").innerHTML = "";
+                            document.querySelector(".modal").classList.add("show");
+                            document.querySelector(".modal").style.display = "block";
+                            y.byId("msg").innerHTML = "Gravado com sucesso!";
+
+                            y.byId("exampleModalLabel").innerHTML = "";
+                            y.byId("exampleModalLabel").innerHTML = "Menssagem";
+                        }
+                        if (retorno.msg.length != 0) {
+                            y.byId("msg").innerHTML = "";
+                            document.querySelector(".modal").classList.add("show");
+                            document.querySelector(".modal").style.display = "block";
+                            var msg = "";
+                            for (i = 0; i < retorno.msg.length; i++) {
+                                msg += retorno.msg[i] + "</br>";
+                            }
+                            y.byId("msg").innerHTML = msg;
+                        }
+                    }, function () {
+                        y.byId("msg").innerHTML = "";
+                        document.querySelector(".modal").classList.add("show");
+                        document.querySelector(".modal").style.display = "block";
+                    });
+
+                }
+
+                else {
+                    y.byId("msg").innerHTML = "";
+                    document.querySelector(".modal").classList.add("show");
+                    document.querySelector(".modal").style.display = "block";
+                    y.byId("msg").innerHTML = "Preencha todos os campos corretamente!";
+                }
+
+            },
+
+            confirma: function () {
+                var msg = "Vai excluir?";
+                dialog1.confirm(msg);
+            },
+
+            excluir: function () {
+
+                var dados = {
+                    cpf: y.byId("cpf").value,
+                };
+                if (dados.cpf.length == 11) {
+                    y.ajax(dados, "/Cliente/Excluir", "POST", function (dados) {
+                        //sucesso
+                        if (dados.excluiu == true) {
+                            cli.clear();
+                            y.byId("msg").innerHTML = "";
+                            document.querySelector(".modal").classList.add("show");
+                            document.querySelector(".modal").style.display = "block";
+                            y.byId("msg").innerHTML = "Excluido com sucesso!";
+                        }
+                        else {
+                            y.byId("msg").innerHTML = "";
+                            document.querySelector(".modal").classList.add("show");
+                            document.querySelector(".modal").style.display = "block";
+                            y.byId("msg").innerHTML = "Cliente não existente";
+                        }
+
+
+                    }, function (dados) {
+                        y.byId("msg").innerHTML = "";
+                        document.querySelector(".modal").classList.add("show");
+                        document.querySelector(".modal").style.display = "block";
+                    });
+                }
+
+                else {
+                    y.byId("msg").innerHTML = "";
+                    document.querySelector(".modal").classList.add("show");
+                    document.querySelector(".modal").style.display = "block";
+                    y.byId("msg").innerHTML = "Informe um Cpf válido";
+                }
+
+
+
+            }
+        }
+
+
+
+    </script>
+}
+
+<h2 style="margin-top:3%" class="text-center">Cadastro de Cliente</h2>
+
+<form style="margin-top:3%">
+    <div class="form-row col-md-6" style="margin: 0 auto">
+        <div class="form-group col-md-8">
+            <label for="inputEmail4">CPF</label>
+            <input data-validation-cpf="O CPF está inválido" data-validation-required="Requerido" data-validation-summary="msgCPF" type="text" class="form-control form-control-sm" id="cpf" maxlength="11" placeholder="Sem pontos ou caracteres especiais">
+            <span class="invalid" id="msgCPF"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Nome</label>
+            <input data-validation-required="Nome é requerido" data-validation-summary="msgNome" type="text" class="form-control form-control-sm" id="nome" placeholder="Nome" />
+            <span class="invalid" id="msgNome"></span>
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Sobrenome</label>
+            <input data-validation-required="Sobrenome é requerido" data-validation-summary="msgSobrenome" type="text" class="form-control form-control-sm" id="sobrenome" placeholder="Sobrenome">
+            <span class="invalid" id="msgSobrenome"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="inputPassword4">Celular</label>
+            <input data-validation-required="Celular é requerido" data-validation-summary="msgCelular" type="text" class="form-control form-control-sm" id="celular" placeholder="Celular">
+            <span class="invalid" id="msgCelular"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="inputEmail4">Cidade</label>
+            <input data-validation-required="Campo Cidade é requerido" data-validation-summary="msgCidade" class="form-control form-control-sm" type="text" id="cidade" placeholder="Cidade">
+            <span class="invalid" id="msgCidade"></span>
+        </div>
+        <div class="form-group col-md-4">
+            <label for="inputEmail4">Bairro</label>
+            <input data-validation-required="Campo Bairro é requerido" data-validation-summary="msgBairro" class="form-control form-control-sm" type="text" id="bairro" placeholder="Bairro">
+            <span class="invalid" id="msgBairro"></span>
+        </div>
+        <div class="form-group col-md-10">
+            <label for="inputEmail4">Rua</label>
+            <input data-validation-required="Campo Rua é requerido" data-validation-summary="msgRua" class="form-control form-control-sm" type="text" id="rua" placeholder="Rua">
+            <span class="invalid" id="msgRua"></span>
+        </div>
+        <div class="form-group col-md-2">
+            <label for="inputEmail4">Número</label>
+            <input data-validation-required="Campo Número é requerido" data-validation-summary="msgNumero" class="form-control form-control-sm" type="text" id="numero" placeholder="Número">
+            <span class="invalid" id="msgNumero"></span>
+        </div>
+        <div class="form-group col-md-2">
+            <button type="button" id="gravar" class="btn btn-primary">Cadastrar</button>
+        </div>
+        <div class="form-group col-md-2">
+            <button type="button" id="limpar" class="btn btn-primary">Limpar</button>
+        </div>
+        <div class="form-group col-md-2">
+            <button type="button" id="excluir" class="btn btn-primary">Excluir</button>
+        </div>
+    </div>
+
+
+    <!-- MSGS-->
+
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Ops... Algo deu errado!</h5>
+                    <button type="button" class="close" id="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="msg">
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="btnF" data-dismiss="modal">Okay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</form>

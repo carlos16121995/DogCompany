@@ -1,0 +1,224 @@
+﻿@{
+    ViewData["Title"] = "Pesquisar";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+<style>
+    .img {
+        max-width: 100%;
+    }
+
+    .td {
+        padding: 0px !important;
+        width: 20% !important;
+    }
+
+    .carrinho {
+        width: 100%;
+    }
+
+    .th {
+        padding: 0px !important;
+        width: 20% !important;
+    }
+
+    .bt {
+        max-width: 100% !important;
+    }
+
+    .btn-primary {
+        background-color: #2bceba;
+        border-color: #2bceba;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        pesquisar.init();
+        pesquisar.iniciarPesquisar();
+    });
+
+    var pesquisar = {
+
+        animais : [],
+
+        init: function () {
+            y.byId("Pesquisar").onclick = pesquisar.pesquisarOnClick;
+
+        },
+        pesquisarOnClick: function () {
+            var id = y.byId("id").value;
+            if (id == "") {
+                pesquisar.iniciarPesquisar();
+            }
+            else {
+                var dados = {
+                    id: id
+                };
+                y.ajax(dados, "/Venda/PesquisarById", "POST", function (dadosServ) {//sucesso// 
+                    if (dadosServ.existe) {
+                        pesquisar.criarTable(dadosServ);
+                    }
+                    else {
+                        y.byId("tbody").innerHTML = "<tr><td style='text-align: center' colspan='5'>Nenhum animal encontrado!";
+                    }
+                }, function () {//erro
+                });
+            }
+            
+            
+        },
+        iniciarPesquisar: function () {
+            y.ajax(null, "/Venda/PesquisarById", "POST", function (dadosServ) {//sucesso// 
+                if (dadosServ.existe) {
+                    pesquisar.criarTable(dadosServ);
+                }
+                else {
+                    y.byId("tbody").innerHTML = "<tr><td colspan='5'>Nenhum animal encontrado!";
+                }
+                }, function () {//erro
+            });
+        
+            
+        },
+
+        criarTable: function (dados) {
+
+            pesquisar.animais = dados.animal;
+            var tbody = y.byId("tbody");
+            tbody.innerHTML = "";
+            for (var i = 0; i < dados.animal.length; i++) {
+                
+
+
+                var tr = document.createElement("tr");
+                tbody.appendChild(tr);
+
+                var td = document.createElement("td");
+                tr.appendChild(td);
+                td.innerHTML = dados.animal[i].nome;
+
+                var td2 = document.createElement("td");
+                tr.appendChild(td2);
+                td2.innerHTML = dados.animal[i].ano_nascimento;
+
+                var td7 = document.createElement("td");
+                tr.appendChild(td7);
+                td7.innerHTML = dados.animal[i].cor;
+
+                var td3 = document.createElement("td");
+                tr.appendChild(td3);
+                td3.innerHTML = dados.animal[i].especie;
+
+                var td4 = document.createElement("td");
+                tr.appendChild(td4);
+                td4.innerHTML = dados.animal[i].raca;
+
+                var td5 = document.createElement("td");
+                tr.appendChild(td5);
+                td5.innerHTML = dados.animal[i].valor;
+
+                var td6 = document.createElement("td");
+                tr.appendChild(td6);
+
+                if (dados.animal[i].adotado) {
+                    var button = document.createElement("input");
+                    button.type = "submit";
+                    button.className = "btn btn-primary";
+                    button.id = "observar";
+                    button.value = "Observar";
+                    button.setAttribute("data-id", dados.animal[i].id);
+                    td6.appendChild(button);
+                    button.onclick = function () {
+
+                        var id = this.getAttribute("data-id");
+
+                        for (var i = 0; i < pesquisar.animais.length; i++) {
+
+                            if (pesquisar.animais[i].id == id) {
+
+                                window.parent.venda.adicionarObserver(pesquisar.animais[i]);
+                                pesquisar.excluirTr(this);
+                                break;
+                            }
+                        }
+
+                    };
+                }
+                else {
+                    var button = document.createElement("input");
+                    button.type = "submit";
+                    button.className = "btn btn-primary";
+                    button.id = "adicionar";
+                    button.value = "Adicionar";
+                    button.setAttribute("data-id", dados.animal[i].id);
+                    td6.appendChild(button);
+                    button.onclick = function () {
+
+                        var id = this.getAttribute("data-id");
+
+                        for (var i = 0; i < pesquisar.animais.length; i++) {
+
+                            if (pesquisar.animais[i].id == id) {
+
+                                window.parent.venda.adicionarAnimal(pesquisar.animais[i]);
+                                pesquisar.excluirTr(this);
+                                break;
+                            }
+                        }
+
+                    };
+                }
+                
+            }
+        },
+
+
+        excluirTr: function (botao) {
+            var tbody = document.getElementById("tbody");
+            tbody.removeChild(botao.parentNode.parentNode);
+        },
+
+        
+    };
+</script>
+
+<div class="form-row col-md-6" style="margin: 0 auto">
+    <div class="form-row col-md-8" style="margin: 0 auto">
+
+        
+        
+    </div>
+
+    <table class="table">
+        <thead class="thead-light">
+            <tr>
+                <th>
+                    <div class="form-group ">
+                        <label for="inputEmail4">Identificação do Animal</label>
+                        <input type="text" class="form-control form-control-sm" id="id" maxlength="11" placeholder="">
+                    </div>
+                </th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th></th>
+                <th scope="col">
+                    <button class="btn btn-primary" id="Pesquisar" type="submit">Pesquisar</button>
+                </th>
+
+            </tr>
+            <tr>
+                <th scope="col">Nome</th>
+                <th scope="col">Ano nascimento</th>
+                <th scope="col">Cor</th>
+                <th scope="col">Espécie</th>
+                <th scope="col">Raça</th>
+                <th scope="col">Preço</th>
+                <th scope="col">Adotado</th>
+            </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+
+    </table>
+</div>
+

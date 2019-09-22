@@ -1,0 +1,116 @@
+﻿.modale .btn {
+    background: rgba(0, 128, 0, 0.84);
+    /*border: 1px solid #d7d7d7;*/
+    border-radius: 1px;
+    color: #fff;
+    display: inline-block;
+    font-size: 13px;
+    padding: 8px 15px;
+    text-decoration: none;
+    text-align: center;
+    min-width: 60px;
+    position: relative;
+    transition: color .1s ease;
+    margin: 3px;
+    line-height: 1.5em;
+}
+    .modale .btn:hover {
+        background: green;
+    }
+.modale .btn2:hover {
+    background: green;
+}
+
+.modale:before {
+    content: "";
+    display: none;
+    background: rgba(230, 230, 230, 0.6);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 10;
+}
+
+.modale.opened:before {
+    display: block;
+}
+
+.modale.opened .modal-dialog1 {
+    -webkit-transform: translate(0, 0);
+    -ms-transform: translate(0, 0);
+    transform: translate(0, 0);
+    top: 20%;
+}
+
+.modale .modal-dialog1 {
+    margin-left: -250px;
+    position: fixed;
+    left: 50%;
+    z-index: 9999;
+    width: 500px;
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.86);
+    transform: translate(0, -500%);
+    transition: transform 0.3s ease-out;
+    text-align: left;
+    background-color: #fff;
+    background-clip: padding-box;
+    border-radius: 2px;
+}
+
+.modale .modal-body {
+    padding: 10px;
+    margin: 10px;
+    overflow-y: auto;
+    max-height: 300px;
+    font-size: 14px;
+    line-height: 1.4em;
+}
+
+.modale .modal-footer {
+    padding: 10px 10px;
+    /*border-top: #eeeeee solid 1px;*/
+    text-align: right;
+}
+
+.modale .modal-header {
+    border-bottom: #eeeeee solid 1px;
+    font-size: 14px;
+    padding: 15px 20px;
+    text-align: left;
+    min-height: 18px;
+}
+
+    .modale .modal-header.confirm {
+        background: rgba(0, 130, 55, 0.7);
+        color: #fff;
+    }
+
+    .modale .modal-header.alert {
+        background: rgba(0, 130, 55, 0.7);
+        color: #fff;
+    }
+
+    .modale .modal-header.error {
+        background: rgba(217, 30, 24, 0.6);
+        color: #fff;
+    }
+
+
+
+@media (max-width: 768px) {
+
+    .modale .modal-dialog1 {
+        margin-left: -140px;
+        width: 280px;
+    }
+
+    .modale .modal-footer {
+        text-align: center;
+    }
+
+    .modale .btn, .modale .btn2 {
+        padding: 8px 8px;
+    }
+}

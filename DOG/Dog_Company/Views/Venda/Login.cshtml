@@ -1,0 +1,83 @@
+﻿@{
+    ViewBag.Titulo = "Login";
+    Layout = "~/Views/Shared/_LayoutLogin.cshtml";
+}
+@section style {
+    <style>
+
+        .rounded {
+            width: 20%;
+            padding: 2%;
+        }
+
+        #form {
+            width: 30%;
+            margin: 0 auto;
+            padding: 2%;
+        }
+
+        .btn-primary {
+            background-color: #2bceba;
+            border-color: #2bceba;
+        }
+
+        .text-center {
+            padding-top: 5%;
+        }
+    </style>
+}
+@section script{ 
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            logar.init();
+        });
+        var logar = {
+
+            init: function () {
+                y.byId("Entrar").onclick = logar.entrar;
+            },
+            entrar: function () {
+                var login = y.byId("exampleInputEmail1").value;
+                var senha = y.byId("exampleInputPassword1").value;
+                var dados = {
+                    login,
+                    senha
+                };
+
+                y.ajax(dados, "/Venda/Entrar", "POST", function (lit) {
+                    if (lit.logado) {
+                        document.location.href = lit.url;
+                    }
+                    else {
+
+                        y.byId("divMsg").innerHTML = "Usuário inválido.";
+
+                    } }, function () { });
+            }
+
+        }
+    </script>
+
+}
+
+
+
+<div class="text-center">
+    <img src="~/images/Logo.jpg" class="rounded" alt="Desenho de um cachorro">
+</div>
+
+<div>
+    <form id="form">
+        <div class="form-group">
+            <label for="exampleInputEmail1">Endereço de email</label>
+            <input type="email" class="form-control form-control-sm" value="admin@hotmail.com" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+        </div>
+        <div class="form-group">
+            <label for="exampleInputPassword1">Senha</label>
+            <input type="password" class="form-control form-control-sm"value="admin" id="exampleInputPassword1" placeholder="Password">
+        </div>
+
+        <button type="button"id="Entrar" class="btn btn-primary">Entrar</button>
+    </form>
+    <div id="divMsg"></div>
+</div>

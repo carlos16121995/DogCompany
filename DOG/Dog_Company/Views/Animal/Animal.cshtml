@@ -1,0 +1,149 @@
+﻿    
+@{
+    ViewBag.Titulo = "Animal";
+    Layout = "~/Views/Shared/_LayoutPrincipal.cshtml";
+}
+@section style {
+    <style>
+        .img {
+            max-width: 100%;
+            width: auto;
+        }
+
+        .btn-primary {
+            background-color: #2bceba;
+            border-color: #2bceba;
+        }
+    </style>
+}
+<h2 style="margin-top:3%" class="text-center">Cadastrar Animais</h2>
+
+@section script{
+    <script src="~/js/simplaojs.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            animal.init();
+        });
+        var animal = {
+
+            init: function () {
+                y.byId("gravar").onclick = animal.gravar;
+                y.byId("btnF").onclick = y.esconder;
+                y.byId("close").onclick = y.esconder;
+            },
+
+            gravar: function () {
+                var dados = {
+                    id: y.byId("id").value,
+                    nome: y.byId("nome").value,
+                    mesNas: y.byId("mesNas").value,
+                    anoNas: y.byId("anoNas").value,
+                    especie: y.byId("especie").value,
+                    raca: y.byId("raca").value,
+                    cor: y.byId("cor").value,
+                    valor: y.byId("valor").value,
+                    adotado: y.byId("adotado").value
+                }
+                y.ajax(dados, "/Animal/Gravar", "POST", function (retorno) {
+
+                    if (retorno.lista.length != 0) {
+                        y.byId("msg").innerHTML = "";
+                        document.querySelector(".modal").classList.add("show");
+                        document.querySelector(".modal").style.display = "block";
+                        var msg = "";
+                        for (i = 0; i < retorno.lista.length; i++) {
+                            msg += retorno.lista[i] + "</br>";
+                        }
+                        y.byId("msg").innerHTML = msg;
+                    }
+
+                }, function (dadosRet) { alert("deu erro"); });
+            },
+
+
+
+        };
+
+
+    </script>
+
+
+
+
+}
+
+<form style="margin-top:3%">
+
+    <div class="form-row col-md-6" style="margin: 0 auto">
+        <div class="form-group col-md-2">
+            <label for="inputPassword4">Id</label>
+            <input type="text" class="form-control form-control-sm" value="0" id="id" placeholder="Id">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="inputPassword4">Nome</label>
+            <input type="text" class="form-control form-control-sm" id="nome" placeholder="Nome">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputPassword4">Mês de Nascimento</label>
+            <input type="number" class="form-control form-control-sm" max="12" min="1" id="mesNas" placeholder="Mês de nascimento">
+        </div>
+        <div class="form-group col-md-3">
+            <label for="inputPassword4">Ano de Nascimento</label>
+            <input type="number" class="form-control form-control-sm" min="1980" id="anoNas" placeholder="Ano de nascimento">
+        </div>
+    </div>
+    <div class="form-row col-md-6" style="margin: 0 auto">
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Espécie</label>
+            <input type="text" class="form-control form-control-sm" id="especie" placeholder="Espécie">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputPassword4">Raça</label>
+            <input type="text" class="form-control form-control-sm" id="raca" placeholder="Raça">
+        </div>
+    </div>
+    <div class="form-row col-md-6" style="margin: 0 auto">
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Cor</label>
+            <input type="text" class="form-control form-control-sm" id="cor" placeholder="Cor">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="inputEmail4">Valor</label>
+            <input type="text" class="form-control form-control-sm" id="valor" placeholder="Valor">
+        </div>
+        <div class="form-row col-md-3" style="margin: 0 auto">
+            @*<div class="custom-control custom-checkbox">
+                    <input type="checkbox" class="custom-control-input" id="adotado">
+                    <label class="custom-control-label" for="customCheck1">Adotado</label>
+                </div>*@
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="adotado" value="true">
+                <label class="form-check-label" for="inlineRadio1">Adotado</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="adotado" value="false">
+                <label class="form-check-label" for="inlineRadio2">Disponível</label>
+            </div>
+        </div>
+        <button type="button" id="gravar" class="btn btn-primary">Gravar</button>
+    </div>
+</form>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Atenção</h5>
+                <button type="button" class="close" id="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body" id="msg">
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnF" data-dismiss="modal">Okay</button>
+            </div>
+        </div>
+    </div>
+</div>
